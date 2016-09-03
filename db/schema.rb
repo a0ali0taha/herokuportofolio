@@ -10,31 +10,70 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160819151645) do
+ActiveRecord::Schema.define(version: 20160903094808) do
 
-  create_table "branches", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "catalogs", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.text     "note",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
-  create_table "procedures", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.integer  "request_id"
-    t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["request_id"], name: "index_procedures_on_request_id", using: :btree
+  create_table "credits", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal  "value",                    precision: 10
+    t.integer  "invoice_id"
+    t.text     "note",       limit: 65535
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.index ["invoice_id"], name: "index_credits_on_invoice_id", using: :btree
   end
 
-  create_table "requests", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "customers", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string   "name"
-    t.text     "description",    limit: 65535
-    t.text     "car_details",    limit: 65535
-    t.string   "technical_name"
-    t.integer  "branch_id"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-    t.index ["branch_id"], name: "index_requests_on_branch_id", using: :btree
+    t.string   "email"
+    t.string   "phone"
+    t.text     "note",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "invoices", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal  "total_value",               precision: 10
+    t.integer  "order_id"
+    t.text     "note",        limit: 65535
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.index ["order_id"], name: "index_invoices_on_order_id", using: :btree
+  end
+
+  create_table "orders", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer  "count"
+    t.integer  "product_id"
+    t.text     "note",        limit: 65535
+    t.integer  "customer_id"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.index ["customer_id"], name: "index_orders_on_customer_id", using: :btree
+    t.index ["product_id"], name: "index_orders_on_product_id", using: :btree
+  end
+
+  create_table "products", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string   "name"
+    t.integer  "count"
+    t.text     "note",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "catalog_id"
+    t.index ["catalog_id"], name: "index_products_on_catalog_id", using: :btree
+  end
+
+  create_table "refunds", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.decimal  "value",                    precision: 10
+    t.integer  "invoice_id"
+    t.text     "note",       limit: 65535
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.index ["invoice_id"], name: "index_refunds_on_invoice_id", using: :btree
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -54,6 +93,7 @@ ActiveRecord::Schema.define(version: 20160819151645) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
-  add_foreign_key "procedures", "requests"
-  add_foreign_key "requests", "branches"
+  add_foreign_key "credits", "invoices"
+  add_foreign_key "invoices", "orders"
+  add_foreign_key "refunds", "invoices"
 end

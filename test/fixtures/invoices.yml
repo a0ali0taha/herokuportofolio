@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  total_value: 9.99
+  order: one
+  note: MyText
+
+two:
+  total_value: 9.99
+  order: two
+  note: MyText
